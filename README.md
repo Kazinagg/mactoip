@@ -30,7 +30,22 @@ PORT=8080 HOST=0.0.0.0 uvx --from git+https://github.com/Kazinagg/mactoip.git ma
 $env:PORT=8080; uvx --from git+https://github.com/Kazinagg/mactoip.git mactoip
 ```
 
+### Готовый Docker-образ из GHCR (без сборки и без клонирования)
+
+Запуск готового контейнера напрямую из реестра GitHub Packages:
+
+```bash
+docker run -d \
+  --name mactoip \
+  -p 8000:8000 \
+  -v ./data:/app/data \
+  --restart unless-stopped \
+  ghcr.io/kazinagg/mactoip:latest
+```
+
 ### Через Docker Compose
+
+#### Вариант А: Из клонированного репозитория
 
 ```bash
 git clone https://github.com/Kazinagg/mactoip.git
@@ -38,7 +53,26 @@ cd mactoip
 docker compose up -d
 ```
 
-База данных автоматически монтируется в локальную папку `./data` на хосте. Остановка сервиса: `docker compose down`.
+#### Вариант Б: Без клонирования (автономный docker-compose.yml)
+
+Создайте на сервере файл `docker-compose.yml` со ссылкой на Git:
+
+```yaml
+services:
+  mactoip:
+    build: https://github.com/Kazinagg/mactoip.git#main
+    container_name: mactoip-registry
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+```
+
+Запуск: `docker compose up -d`. Docker сам выкачает контекст из репозитория и соберет контейнер.
+
+База данных во всех вариантах монтируется в папку `./data` на хосте. Остановка: `docker compose down`.
+
 
 ### Локальный запуск из исходников
 
