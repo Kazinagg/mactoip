@@ -1,70 +1,83 @@
-# Wiren Board MAC-to-IP Registry
+<p align="center">
+  <img src="assets/header.svg" alt="MACTOIP Header" width="100%">
+</p>
 
-Централизованный сетевой реестр и сервис разрешения IP-адресов контроллеров Wiren Board (и любых сетевых устройств) по их MAC-адресам на базе **FastAPI** и **SQLite**.
-
----
-
-## 💡 Для чего нужен этот проект
-
-При работе с парком контроллеров Wiren Board в динамических локальных сетях (DHCP) IP-адреса устройств могут меняться. Этот сервис решает задачу централизованного обнаружения:
-
-1. **Контроллер присылает свои данные**: периодически (по cron) или разово (при загрузке / смене адреса) передает свой MAC, текущий IP и имя.
-2. **Сервер фиксирует устройство**:
-   - Автоматически приводит MAC к стандартному виду (`AA:BB:CC:DD:EE:FF`).
-   - Если устройство новое — регистрирует в базе данных SQLite.
-   - Если уже существует — обновляет IP (при изменении) и фиксирует точное время обращения (`last_seen`).
-3. **Любой клиент может моментально узнать IP контроллера**:
-   - Через API в формате JSON или чистым текстом (`?format=text`) для подстановки в консольные скрипты и SSH.
-   - Через встроенную веб-панель со строкой поиска и счетчиками обращений.
+Сервер учета и разрешения IP-адресов контроллеров Wiren Board по их MAC-адресам. Построен на FastAPI и SQLite.
 
 ---
 
-## 🚀 Быстрый запуск сервера
+## Быстрый запуск
 
-### Способ 1: С использованием `uv` (рекомендуется)
+### Без клонирования репозитория (через uvx)
+
+Если установлен [uv](https://docs.astral.sh/uv/), сервер можно поднять одной командой напрямую из GitHub:
+
 ```bash
-# Клонирование репозитория
-git clone <URL_РЕПОЗИТОРИЯ>
-cd mactoip
-
-# Запуск сервера
-uv run uvicorn mactoip.main:app --host 0.0.0.0 --port 8000 --reload
-# либо через алиас CLI:
-uv run mactoip
+uvx --from git+https://github.com/Kazinagg/mactoip.git mactoip
 ```
 
-### Способ 2: Классический Python / pip
+Сервер сразу доступен:
+- Веб-интерфейс: [http://localhost:8000/](http://localhost:8000/)
+- Документация OpenAPI: [http://localhost:8000/docs](http://localhost:8000/docs)
+- База данных SQLite сохраняется в `data/devices.db`.
+
+Смена порта или хоста при необходимости:
 ```bash
+# Linux / macOS
+PORT=8080 HOST=0.0.0.0 uvx --from git+https://github.com/Kazinagg/mactoip.git mactoip
+
+# Windows PowerShell
+$env:PORT=8080; uvx --from git+https://github.com/Kazinagg/mactoip.git mactoip
+```
+
+### Локальный запуск из исходников
+
+```bash
+git clone https://github.com/Kazinagg/mactoip.git
+cd mactoip
+
+# Через uv
+uv run uvicorn mactoip.main:app --host 0.0.0.0 --port 8000 --reload
+
+# Или стандартный pip
 python -m venv .venv
 source .venv/bin/activate  # На Windows: .venv\Scripts\activate
 pip install -e .
 uvicorn mactoip.main:app --host 0.0.0.0 --port 8000
 ```
 
-Сервер будет доступен по адресам:
-- 📊 **Веб-дашборд**: [http://localhost:8000/](http://localhost:8000/)
-- 📘 **Swagger UI (Интерактивная документация)**: [http://localhost:8000/docs](http://localhost:8000/docs)
-- 💾 **База данных SQLite**: автоматически сохраняется в `data/devices.db`.
+<p align="center">
+  <img src="assets/divider.svg" alt="Divider" width="100%">
+</p>
+
+## Как это устроено
+
+1. Контроллер Wiren Board при старте или периодически по cron отправляет запрос на сервер со своим MAC и текущим IP.
+2. Сервер приводит MAC к стандарту `AA:BB:CC:DD:EE:FF` и обновляет запись в SQLite:
+   - если устройство новое — регистрирует в базе;
+   - если IP изменился — сохраняет новый адрес;
+   - если адрес прежний — обновляет метку времени последнего обращения (`last_seen`) и счетчик запросов.
+3. Любой внешний сервис или администратор может получить актуальный IP контроллера по его MAC в формате JSON или чистым текстом для bash-скриптов.
 
 ---
 
-## 📡 REST API Эндпоинты
+## REST API
 
 | Метод | Путь | Описание |
 | :--- | :--- | :--- |
-| `POST` | `/api/devices/heartbeat` | Регистрация устройства или обновление его IP и метки активности |
-| `GET` | `/api/devices` | Получение списка всех зарегистрированных устройств (`?search=...`) |
-| `GET` | `/api/devices/{mac}` | Детальная информация по конкретному MAC |
-| `GET` | `/api/devices/{mac}/ip` | Быстрое получение IP по MAC (`?format=text` или `?format=json`) |
-| `PATCH`| `/api/devices/{mac}` | Обновление имени (hostname) или пользовательской локации (комментария) |
+| `POST` | `/api/devices/heartbeat` | Регистрация устройства или обновление IP и времени активности |
+| `GET` | `/api/devices` | Список всех устройств (`?search=...`) |
+| `GET` | `/api/devices/{mac}` | Данные конкретного устройства |
+| `GET` | `/api/devices/{mac}/ip` | Получение IP по MAC (`?format=text` или `?format=json`) |
+| `PATCH`| `/api/devices/{mac}` | Обновление имени (hostname) или комментария (локации) |
 | `DELETE`| `/api/devices/{mac}` | Удаление устройства из реестра |
-| `GET` | `/api/health` | Проверка здоровья сервиса и общего числа устройств |
+| `GET` | `/api/health` | Проверка статуса сервера |
 
-### Примеры работы с API
+### Примеры запросов
 
-#### 1. Отправка данных от контроллера:
+**Отправка данных от контроллера:**
 ```bash
-curl -X POST "http://192.168.1.100:8000/api/devices/heartbeat" \
+curl -X POST "http://localhost:8000/api/devices/heartbeat" \
   -H "Content-Type: application/json" \
   -d '{
     "mac": "AC:83:F3:12:34:56",
@@ -73,37 +86,39 @@ curl -X POST "http://192.168.1.100:8000/api/devices/heartbeat" \
   }'
 ```
 
-#### 2. Быстрое получение чистого IP по MAC (для bash/ssh):
+**Получение IP по MAC для bash-скриптов:**
 ```bash
-# Возвращает просто строку вида "192.168.1.150"
-IP=$(curl -s "http://192.168.1.100:8000/api/devices/AC:83:F3:12:34:56/ip?format=text")
-echo "Контроллер найден по адресу: $IP"
+# Возвращает чистую строку с адресом (например, "192.168.1.150")
+IP=$(curl -s "http://localhost:8000/api/devices/AC:83:F3:12:34:56/ip?format=text")
 
-# Подключение к Wiren Board по SSH в одну команду:
-ssh root@$(curl -s "http://192.168.1.100:8000/api/devices/AC:83:F3:12:34:56/ip?format=text")
+# Подключение к контроллеру по SSH в одну команду:
+ssh root@$(curl -s "http://localhost:8000/api/devices/AC:83:F3:12:34:56/ip?format=text")
 ```
 
 ---
 
-## 🛠️ Скрипты для контроллеров Wiren Board
+## Настройка контроллеров Wiren Board
 
-В директории [examples/wirenboard_client/](examples/wirenboard_client/) подготовлены готовые референсные скрипты для инженеров, настраивающих сами борды:
+В каталоге [examples/wirenboard_client/](examples/wirenboard_client/) собраны примеры скриптов для специалистов, настраивающих сами контроллеры:
 
-- `wirenboard_agent.sh` — Bash + `curl` скрипт, автоматически определяющий активный сетевой интерфейс (`eth0`/`wlan0`), MAC и текущий IPv4. Готов для запуска по `cron`.
-- `wirenboard_agent.py` — Python 3 клиент без внешних зависимостей (поддерживает запуск как служба systemd в режиме `--daemon`).
-- [examples/wirenboard_client/README.md](examples/wirenboard_client/README.md) — подробная инструкция по настройке `crontab` и `systemd`.
+- `wirenboard_agent.sh` — bash-скрипт с автоопределением сетевого интерфейса (`eth0`/`wlan0`) для запуска через `cron`.
+- `wirenboard_agent.py` — python-скрипт на стандартной библиотеке без сторонних зависимостей. Поддерживает работу в режиме службы systemd (`--daemon`).
+- [Инструкция по настройке cron и systemd](examples/wirenboard_client/README.md).
 
 ---
 
-## 🧪 Тестирование
+## Тестирование
 
-Запуск набора модульных и интеграционных тестов:
 ```bash
 uv run pytest -v
 ```
 
 ---
 
-## 📖 Разработчикам
+## Разработка
 
-Подробное руководство по архитектуре проекта, расширению схемы базы данных (добавлению новых полей от бордов) и написанию тестов читайте в файле [DEVELOPING.md](DEVELOPING.md).
+Структура базы данных, архитектура и инструкция по добавлению новых полей описаны в [DEVELOPING.md](DEVELOPING.md).
+
+<p align="center">
+  <img src="assets/footer.svg" alt="Footer" width="100%">
+</p>
