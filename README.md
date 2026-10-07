@@ -30,6 +30,16 @@ PORT=8080 HOST=0.0.0.0 uvx --from git+https://github.com/Kazinagg/mactoip.git ma
 $env:PORT=8080; uvx --from git+https://github.com/Kazinagg/mactoip.git mactoip
 ```
 
+### Через Docker Compose
+
+```bash
+git clone https://github.com/Kazinagg/mactoip.git
+cd mactoip
+docker compose up -d
+```
+
+База данных автоматически монтируется в локальную папку `./data` на хосте. Остановка сервиса: `docker compose down`.
+
 ### Локальный запуск из исходников
 
 ```bash
