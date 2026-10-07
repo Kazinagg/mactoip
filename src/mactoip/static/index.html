@@ -1,27 +1,52 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="ru" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Wiren Board MAC-to-IP Registry</title>
+    <title>Wiren Board Registry | mactoip</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg-base: #0c1017;
-            --bg-surface: #151b26;
-            --bg-surface-hover: #1c2433;
-            --border: #232d3f;
-            --text-main: #f0f3f6;
-            --text-muted: #8b949e;
+            --bg-page: #f8fafc;
+            --bg-surface: #ffffff;
+            --bg-surface-subtle: #f1f5f9;
+            --border: #e2e8f0;
+            --border-hover: #cbd5e1;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --primary: #0284c7;
+            --primary-hover: #0369a1;
+            --primary-subtle: #f0f9ff;
+            --danger: #dc2626;
+            --danger-hover: #b91c1c;
+            --danger-subtle: #fef2f2;
+            --radius-sm: 6px;
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+        }
+
+        [data-theme="dark"] {
+            --bg-page: #090d16;
+            --bg-surface: #111726;
+            --bg-surface-subtle: #172033;
+            --border: #1e293b;
+            --border-hover: #334155;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --text-muted: #94a3b8;
             --primary: #38bdf8;
-            --primary-glow: rgba(56, 189, 248, 0.15);
-            --badge-recent: #10b981;
-            --badge-recent-bg: rgba(16, 185, 129, 0.15);
-            --danger: #ef4444;
-            --danger-bg: rgba(239, 68, 68, 0.15);
-            --radius: 12px;
+            --primary-hover: #0ea5e9;
+            --primary-subtle: rgba(56, 189, 248, 0.1);
+            --danger: #f87171;
+            --danger-hover: #ef4444;
+            --danger-subtle: rgba(248, 113, 113, 0.1);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
         }
 
         * {
@@ -31,162 +56,169 @@
         }
 
         body {
-            font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
-            background-color: var(--bg-base);
-            color: var(--text-main);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-page);
+            color: var(--text-primary);
             min-height: 100vh;
-            padding: 24px;
+            padding: 32px 24px;
+            line-height: 1.5;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
 
         .container {
-            max-width: 1320px;
+            max-width: 1240px;
             margin: 0 auto;
         }
 
+        /* Верхняя панель */
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
             padding-bottom: 20px;
             border-bottom: 1px solid var(--border);
             flex-wrap: wrap;
             gap: 16px;
         }
 
-        .logo-area {
+        .brand-group {
             display: flex;
-            align-items: center;
-            gap: 14px;
+            flex-direction: column;
+            gap: 2px;
         }
 
-        .logo-badge {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, #0284c7, #6366f1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            box-shadow: 0 4px 14px var(--primary-glow);
-        }
-
-        h1 {
-            font-size: 24px;
+        .brand-title {
+            font-size: 20px;
             font-weight: 700;
             letter-spacing: -0.02em;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
         }
 
-        .subtitle {
+        .brand-version {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            font-weight: 500;
+            padding: 2px 7px;
+            border-radius: var(--radius-sm);
+            background: var(--bg-surface-subtle);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+        }
+
+        .brand-subtitle {
             font-size: 13px;
             color: var(--text-muted);
-            margin-top: 2px;
         }
 
-        .header-actions {
+        .header-controls {
             display: flex;
-            gap: 10px;
             align-items: center;
+            gap: 8px;
         }
 
+        /* Кнопки */
         .btn {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 9px 16px;
-            border-radius: 8px;
+            gap: 7px;
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
             font-size: 13px;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            border: 1px solid transparent;
-            transition: all 0.2s ease;
+            border: 1px solid var(--border);
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            transition: all 0.15s ease;
             text-decoration: none;
+            user-select: none;
+        }
+
+        .btn:hover {
+            background: var(--bg-surface-subtle);
+            border-color: var(--border-hover);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
         }
 
         .btn-primary {
-            background: #2563eb;
-            color: white;
+            background: var(--primary);
+            color: #ffffff;
+            border-color: var(--primary);
         }
 
         .btn-primary:hover {
-            background: #1d4ed8;
+            background: var(--primary-hover);
+            border-color: var(--primary-hover);
+            color: #ffffff;
         }
 
-        .btn-ghost {
-            background: var(--bg-surface);
-            color: var(--text-main);
-            border-color: var(--border);
+        .btn-icon-only {
+            padding: 8px;
+            line-height: 1;
         }
 
-        .btn-ghost:hover {
-            background: var(--bg-surface-hover);
-            border-color: #3b475d;
+        .svg-icon {
+            width: 15px;
+            height: 15px;
+            stroke-width: 2;
+            flex-shrink: 0;
         }
 
-        /* Metrics Grid */
+        /* Метрики */
         .metrics-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
             gap: 16px;
-            margin-bottom: 28px;
+            margin-bottom: 24px;
         }
 
         .metric-card {
             background: var(--bg-surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 18px 20px;
+            border-radius: var(--radius-lg);
+            padding: 16px 20px;
+            box-shadow: var(--shadow-sm);
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;
         }
 
-        .metric-title {
+        .metric-label {
             font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
+            font-weight: 500;
             color: var(--text-muted);
-            font-weight: 600;
         }
 
-        .metric-value {
-            font-size: 30px;
+        .metric-number {
+            font-size: 26px;
             font-weight: 700;
             letter-spacing: -0.02em;
-            color: var(--primary);
+            color: var(--text-primary);
+            font-family: 'JetBrains Mono', monospace;
         }
 
-        /* Controls Toolbar */
+        /* Панель инструментов */
         .toolbar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            gap: 14px;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
             flex-wrap: wrap;
         }
 
-        .search-box {
+        .search-wrapper {
             flex: 1;
-            min-width: 280px;
+            min-width: 260px;
+            max-width: 480px;
             position: relative;
-        }
-
-        .search-input {
-            width: 100%;
-            background: var(--bg-surface);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            padding: 10px 14px 10px 38px;
-            color: var(--text-main);
-            font-size: 14px;
-            outline: none;
-            transition: border-color 0.2s;
-        }
-
-        .search-input:focus {
-            border-color: var(--primary);
         }
 
         .search-icon {
@@ -195,16 +227,33 @@
             top: 50%;
             transform: translateY(-50%);
             color: var(--text-muted);
-            font-size: 14px;
+            pointer-events: none;
         }
 
-        /* Table Card */
-        .table-card {
+        .search-input {
+            width: 100%;
             background: var(--bg-surface);
             border: 1px solid var(--border);
-            border-radius: var(--radius);
+            border-radius: var(--radius-md);
+            padding: 8px 12px 8px 36px;
+            font-size: 13px;
+            color: var(--text-primary);
+            outline: none;
+            transition: border-color 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .search-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px var(--primary-subtle);
+        }
+
+        /* Таблица */
+        .table-wrapper {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
             overflow: hidden;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
         }
 
         table {
@@ -215,20 +264,20 @@
         }
 
         th {
-            background: #111620;
-            color: var(--text-muted);
-            padding: 14px 18px;
+            background: var(--bg-surface-subtle);
+            color: var(--text-secondary);
+            padding: 12px 16px;
             font-weight: 600;
             font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 0.04em;
             border-bottom: 1px solid var(--border);
+            white-space: nowrap;
         }
 
         td {
-            padding: 14px 18px;
+            padding: 12px 16px;
             border-bottom: 1px solid var(--border);
             vertical-align: middle;
+            color: var(--text-primary);
         }
 
         tr:last-child td {
@@ -236,171 +285,292 @@
         }
 
         tr:hover td {
-            background: var(--bg-surface-hover);
+            background-color: var(--bg-surface-subtle);
         }
 
         .mono {
             font-family: 'JetBrains Mono', monospace;
-            font-size: 13px;
+            font-size: 12.5px;
         }
 
-        .mac-tag {
-            color: #7dd3fc;
+        .mac-cell {
             font-weight: 600;
-            letter-spacing: 0.02em;
+            color: var(--text-primary);
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
         }
 
         .ip-link {
-            color: #38bdf8;
+            color: var(--primary);
             text-decoration: none;
-            font-weight: 600;
+            font-weight: 500;
         }
 
         .ip-link:hover {
             text-decoration: underline;
         }
 
-        .time-badge {
-            display: inline-block;
-            font-weight: 600;
-            color: #f1f5f9;
+        .time-main {
+            font-weight: 500;
+            color: var(--text-primary);
         }
 
-        .time-sub {
+        .time-rel {
+            font-size: 11.5px;
             color: var(--text-muted);
-            font-size: 12px;
-            margin-top: 2px;
+            margin-top: 1px;
         }
 
-        .actions-cell {
+        /* Микро-кнопки действий в таблице */
+        .table-actions {
             display: flex;
-            gap: 6px;
+            align-items: center;
             justify-content: flex-end;
+            gap: 4px;
         }
 
-        .btn-icon {
+        .btn-table {
             background: transparent;
-            border: 1px solid var(--border);
+            border: 1px solid transparent;
             color: var(--text-muted);
-            padding: 5px 8px;
-            border-radius: 6px;
+            padding: 5px 7px;
+            border-radius: var(--radius-sm);
             cursor: pointer;
-            font-size: 11px;
-            transition: all 0.2s;
+            font-size: 12px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: all 0.15s ease;
         }
 
-        .btn-icon:hover {
-            color: var(--text-main);
-            border-color: #3b475d;
-            background: #1c2433;
+        .btn-table:hover {
+            background: var(--bg-surface);
+            border-color: var(--border);
+            color: var(--text-primary);
         }
 
-        .btn-icon.delete:hover {
+        .btn-table.danger:hover {
+            background: var(--danger-subtle);
+            border-color: var(--danger-subtle);
             color: var(--danger);
-            border-color: var(--danger);
-            background: var(--danger-bg);
         }
 
+        /* Пустое состояние */
         .empty-state {
-            padding: 48px 20px;
+            padding: 48px 24px;
             text-align: center;
             color: var(--text-muted);
         }
 
-        .empty-icon {
-            font-size: 36px;
-            margin-bottom: 12px;
-            opacity: 0.6;
+        .empty-state-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 4px;
         }
 
-        /* Toast */
+        .empty-state-desc {
+            font-size: 13px;
+        }
+
+        /* Всплывающее уведомление (Toast) */
         .toast {
             position: fixed;
             bottom: 24px;
             right: 24px;
-            background: #1e293b;
-            color: #f8fafc;
-            border: 1px solid #334155;
-            padding: 12px 20px;
-            border-radius: 8px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.4);
+            background: var(--text-primary);
+            color: var(--bg-surface);
+            padding: 10px 16px;
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow-md);
             font-size: 13px;
-            z-index: 999;
+            font-weight: 500;
             opacity: 0;
-            transform: translateY(10px);
-            transition: all 0.25s ease;
+            transform: translateY(8px);
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
             pointer-events: none;
+            z-index: 1000;
         }
 
         .toast.show {
             opacity: 1;
             transform: translateY(0);
         }
+
+        /* Модальное окно редактирования */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(15, 23, 42, 0.4);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            width: 100%;
+            max-width: 440px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+        }
+
+        .modal-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 14px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            background: var(--bg-page);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 8px 12px;
+            font-size: 13px;
+            color: var(--text-primary);
+            outline: none;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
+        <!-- Шапка -->
         <header>
-            <div class="logo-area">
-                <div class="logo-badge">⚡</div>
-                <div>
-                    <h1>Wiren Board Registry</h1>
-                    <div class="subtitle">Централизованный реестр разрешения MAC-в-IP адресов</div>
+            <div class="brand-group">
+                <div class="brand-title">
+                    Реестр устройств Wiren Board
+                    <span class="brand-version">mactoip</span>
                 </div>
+                <div class="brand-subtitle">Разрешение IP-адресов по MAC и мониторинг активности контроллеров</div>
             </div>
-            <div class="header-actions">
-                <button class="btn btn-ghost" onclick="sendTestHeartbeat()">+ Тестовый пинг</button>
-                <a href="/docs" target="_blank" class="btn btn-primary">Swagger /docs</a>
+            <div class="header-controls">
+                <button class="btn btn-icon-only" id="themeToggleBtn" title="Переключить тему" onclick="toggleTheme()">
+                    <!-- Солнце (для переключения на светлую) -->
+                    <svg id="themeIconSun" class="svg-icon" style="display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                    <!-- Луна (для переключения на темную) -->
+                    <svg id="themeIconMoon" class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                </button>
+                <button class="btn" onclick="sendTestHeartbeat()">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <line x1="12" y1="5" x2="12" y2="19"></line>
+                        <line x1="5" y1="12" x2="19" y2="12"></line>
+                    </svg>
+                    Тестовый запрос
+                </button>
+                <a href="/docs" target="_blank" class="btn btn-primary">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Документация API
+                </a>
             </div>
         </header>
 
         <!-- Метрики -->
         <div class="metrics-grid">
             <div class="metric-card">
-                <div class="metric-title">Всего устройств в базе</div>
-                <div class="metric-value" id="metric-total">0</div>
+                <div class="metric-label">Всего устройств в базе</div>
+                <div class="metric-number" id="metric-total">0</div>
             </div>
             <div class="metric-card">
-                <div class="metric-title">Обновлены за последние 24ч</div>
-                <div class="metric-value" style="color: var(--badge-recent);" id="metric-recent">0</div>
+                <div class="metric-label">Активность за 24 ч</div>
+                <div class="metric-number" style="color: var(--primary);" id="metric-recent">0</div>
             </div>
             <div class="metric-card">
-                <div class="metric-title">Всего зафиксировано запросов</div>
-                <div class="metric-value" style="color: #a78bfa;" id="metric-requests">0</div>
+                <div class="metric-label">Суммарно запросов</div>
+                <div class="metric-number" id="metric-requests">0</div>
             </div>
         </div>
 
         <!-- Панель управления -->
         <div class="toolbar">
-            <div class="search-box">
-                <span class="search-icon">🔍</span>
-                <input type="text" id="searchInput" class="search-input" placeholder="Поиск по MAC, IP, Hostname или комментарию..." oninput="filterDevices()">
+            <div class="search-wrapper">
+                <svg class="svg-icon search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+                <input type="text" id="searchInput" class="search-input" placeholder="Поиск по MAC, IP, имени или локации..." oninput="filterDevices()">
             </div>
             <div>
-                <button class="btn btn-ghost" onclick="loadDevices()">↻ Обновить список</button>
+                <button class="btn" onclick="loadDevices()">
+                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                        <polyline points="23 4 23 10 17 10"></polyline>
+                        <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+                    </svg>
+                    Обновить
+                </button>
             </div>
         </div>
 
         <!-- Таблица устройств -->
-        <div class="table-card">
+        <div class="table-wrapper">
             <table>
                 <thead>
                     <tr>
-                        <th>MAC Адрес</th>
-                        <th>Текущий IP</th>
-                        <th>Имя устройства (Hostname)</th>
-                        <th>Комментарий / Локация</th>
-                        <th>Первое появление</th>
-                        <th>Последнее обновление</th>
-                        <th style="text-align: center;">Обращений</th>
+                        <th>MAC-адрес</th>
+                        <th>IP-адрес</th>
+                        <th>Имя хоста</th>
+                        <th>Локация / комментарий</th>
+                        <th>Первое обращение</th>
+                        <th>Последнее обращение</th>
+                        <th style="text-align: center;">Запросов</th>
                         <th style="text-align: right;">Действия</th>
                     </tr>
                 </thead>
                 <tbody id="deviceTableBody">
                     <tr>
                         <td colspan="8" class="empty-state">
-                            <div class="empty-icon">⏳</div>
-                            <div>Загрузка реестра устройств...</div>
+                            <div class="empty-state-title">Загрузка данных...</div>
                         </td>
                     </tr>
                 </tbody>
@@ -408,19 +578,71 @@
         </div>
     </div>
 
+    <!-- Модальное окно редактирования -->
+    <div class="modal-overlay" id="editModal">
+        <div class="modal-card">
+            <div class="modal-title">Редактирование устройства</div>
+            <input type="hidden" id="editMac">
+            <div class="form-group">
+                <label class="form-label">MAC-адрес</label>
+                <input type="text" id="displayMac" class="form-input mono" readonly disabled>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Имя устройства (hostname)</label>
+                <input type="text" id="inputHost" class="form-input" placeholder="например, wb-main-panel">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Локация / комментарий</label>
+                <input type="text" id="inputComment" class="form-input" placeholder="например, Щит автоматики 1 этаж">
+            </div>
+            <div class="modal-footer">
+                <button class="btn" onclick="closeEditModal()">Отмена</button>
+                <button class="btn btn-primary" onclick="saveDeviceMeta()">Сохранить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Всплывающее уведомление -->
     <div id="toast" class="toast">Уведомление</div>
 
     <script>
         let allDevices = [];
 
+        // Управление темой (Светлая по умолчанию)
+        function initTheme() {
+            const saved = localStorage.getItem('mactoip_theme') || 'light';
+            setTheme(saved);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme') || 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            setTheme(next);
+        }
+
+        function setTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            localStorage.setItem('mactoip_theme', theme);
+
+            const sun = document.getElementById('themeIconSun');
+            const moon = document.getElementById('themeIconMoon');
+            if (theme === 'dark') {
+                sun.style.display = 'block';
+                moon.style.display = 'none';
+            } else {
+                sun.style.display = 'none';
+                moon.style.display = 'block';
+            }
+        }
+
         function showToast(text) {
             const toast = document.getElementById('toast');
             toast.textContent = text;
             toast.classList.add('show');
-            setTimeout(() => toast.classList.remove('show'), 2800);
+            setTimeout(() => toast.classList.remove('show'), 2400);
         }
 
-        function copyToClipboard(text) {
+        function copyText(text, label) {
             navigator.clipboard.writeText(text).then(() => {
                 showToast(`Скопировано: ${text}`);
             });
@@ -494,8 +716,8 @@
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="8" class="empty-state">
-                            <div class="empty-icon">📡</div>
-                            <div>Устройства не обнаружены или не подходят под поисковый запрос</div>
+                            <div class="empty-state-title">Устройства не найдены</div>
+                            <div class="empty-state-desc">Отправьте первый запрос на эндпоинт /api/devices/heartbeat</div>
                         </td>
                     </tr>
                 `;
@@ -510,32 +732,64 @@
                 return `
                     <tr>
                         <td>
-                            <span class="mono mac-tag">${d.mac}</span>
-                            <button class="btn-icon" title="Скопировать MAC" onclick="copyToClipboard('${d.mac}')">📋</button>
+                            <div class="mac-cell">
+                                <span class="mono">${d.mac}</span>
+                                <button class="btn-table" title="Копировать MAC" onclick="copyText('${d.mac}')">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </td>
                         <td>
-                            <a href="http://${d.ip}" target="_blank" class="mono ip-link">${d.ip}</a>
-                            <button class="btn-icon" title="Скопировать IP" onclick="copyToClipboard('${d.ip}')">📋</button>
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                <a href="http://${d.ip}" target="_blank" class="mono ip-link">${d.ip}</a>
+                                <button class="btn-table" title="Копировать IP" onclick="copyText('${d.ip}')">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                                        <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </td>
-                        <td><strong>${d.hostname || '<span class="time-sub">—</span>'}</strong></td>
+                        <td>${d.hostname ? `<strong>${d.hostname}</strong>` : '<span style="color: var(--text-muted);">—</span>'}</td>
                         <td>
-                            <span style="color: var(--text-muted);">${d.comment || '—'}</span>
-                            <button class="btn-icon" title="Редактировать имя и локацию" onclick="editMeta('${d.mac}', '${d.hostname || ''}', '${d.comment || ''}')">✏️</button>
+                            <div style="display: inline-flex; align-items: center; gap: 6px;">
+                                <span>${d.comment || '<span style="color: var(--text-muted);">—</span>'}</span>
+                                <button class="btn-table" title="Изменить имя и комментарий" onclick="openEditModal('${d.mac}', '${d.hostname || ''}', '${d.comment || ''}')">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <path d="M12 20h9"></path>
+                                        <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"></path>
+                                    </svg>
+                                </button>
+                            </div>
                         </td>
                         <td>
-                            <div class="time-sub">${firstTime}</div>
+                            <div class="time-rel">${firstTime}</div>
                         </td>
                         <td>
-                            <div class="time-badge">${absTime}</div>
-                            <div class="time-sub">${relTime}</div>
+                            <div class="time-main">${absTime}</div>
+                            <div class="time-rel">${relTime}</div>
                         </td>
                         <td style="text-align: center;">
-                            <span class="mono" style="color: #cbd5e1;">${d.update_count}</span>
+                            <span class="mono">${d.update_count}</span>
                         </td>
                         <td style="text-align: right;">
-                            <div class="actions-cell">
-                                <button class="btn-icon" title="Скопировать curl команду" onclick="copyCurl('${d.mac}')">curl</button>
-                                <button class="btn-icon delete" title="Удалить устройство" onclick="deleteDevice('${d.mac}')">✕</button>
+                            <div class="table-actions">
+                                <button class="btn-table" title="Копировать curl команду" onclick="copyCurl('${d.mac}')">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <polyline points="4 17 10 11 4 5"></polyline>
+                                        <line x1="12" y1="19" x2="20" y2="19"></line>
+                                    </svg>
+                                    curl
+                                </button>
+                                <button class="btn-table danger" title="Удалить запись" onclick="deleteDevice('${d.mac}')">
+                                    <svg class="svg-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                        <polyline points="3 6 5 6 21 6"></polyline>
+                                        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    </svg>
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -543,11 +797,22 @@
             }).join('');
         }
 
-        async function editMeta(mac, currentHost, currentComment) {
-            const newHost = prompt(`Имя устройства (hostname) для ${mac}:`, currentHost);
-            if (newHost === null) return;
-            const newComment = prompt(`Комментарий / Локация для ${mac}:`, currentComment);
-            if (newComment === null) return;
+        function openEditModal(mac, currentHost, currentComment) {
+            document.getElementById('editMac').value = mac;
+            document.getElementById('displayMac').value = mac;
+            document.getElementById('inputHost').value = currentHost;
+            document.getElementById('inputComment').value = currentComment;
+            document.getElementById('editModal').classList.add('active');
+        }
+
+        function closeEditModal() {
+            document.getElementById('editModal').classList.remove('active');
+        }
+
+        async function saveDeviceMeta() {
+            const mac = document.getElementById('editMac').value;
+            const newHost = document.getElementById('inputHost').value.trim();
+            const newComment = document.getElementById('inputComment').value.trim();
 
             try {
                 const res = await fetch(`/api/devices/${encodeURIComponent(mac)}`, {
@@ -556,10 +821,11 @@
                     body: JSON.stringify({hostname: newHost, comment: newComment})
                 });
                 if (res.ok) {
-                    showToast('Метаданные обновлены');
+                    showToast('Данные устройства сохранены');
+                    closeEditModal();
                     loadDevices();
                 } else {
-                    alert('Ошибка обновления');
+                    alert('Ошибка при сохранении данных');
                 }
             } catch (err) {
                 alert('Сбой сети: ' + err);
@@ -567,7 +833,7 @@
         }
 
         async function deleteDevice(mac) {
-            if (!confirm(`Вы действительно хотите удалить устройство с MAC ${mac}?`)) return;
+            if (!confirm(`Удалить устройство ${mac} из реестра?`)) return;
             try {
                 const res = await fetch(`/api/devices/${encodeURIComponent(mac)}`, {
                     method: 'DELETE'
@@ -577,14 +843,14 @@
                     loadDevices();
                 }
             } catch (err) {
-                alert('Сбой удаления: ' + err);
+                alert('Сбой сети: ' + err);
             }
         }
 
         function copyCurl(mac) {
             const url = `${window.location.origin}/api/devices/${mac}/ip?format=text`;
             const cmd = `curl -s "${url}"`;
-            copyToClipboard(cmd);
+            copyText(cmd);
         }
 
         async function sendTestHeartbeat() {
@@ -592,7 +858,7 @@
             const randomMac = octets.join(':').toUpperCase();
             const randomLast = Math.floor(Math.random() * 200) + 20;
             const testIp = `192.168.1.${randomLast}`;
-            const testHost = `wb-test-${randomLast}`;
+            const testHost = `wb-device-${randomLast}`;
 
             try {
                 const res = await fetch('/api/devices/heartbeat', {
@@ -600,15 +866,17 @@
                     headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify({mac: randomMac, ip: testIp, hostname: testHost})
                 });
-                const data = await res.json();
-                showToast(`Добавлено тестовое устройство ${randomMac} (${testIp})`);
-                loadDevices();
+                if (res.ok) {
+                    showToast(`Добавлено устройство: ${randomMac} (${testIp})`);
+                    loadDevices();
+                }
             } catch (err) {
-                alert('Сбой отправки тестового пинга: ' + err);
+                alert('Сбой отправки тестового запроса: ' + err);
             }
         }
 
-        // Автозагрузка и периодический опрос каждые 5 секунд
+        // Инициализация
+        initTheme();
         loadDevices();
         setInterval(loadDevices, 5000);
     </script>
